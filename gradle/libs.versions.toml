@@ -35,7 +35,7 @@ androidx-material = { group = "com.google.android.material3", name = "material3"
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 webcam-capture = {module = "com.github.sarxos:webcam-capture", version.ref = "webcam-capture"}
-webcam-capture-driver-fswebcam = { module = "com.github.sarxos:webcam-capture-driver-opencv", version.ref = "webcam-capture" }
+webcam-capture-driver-opencv = { module = "com.github.sarxos:webcam-capture-driver-opencv", version.ref = "webcam-capture" }
 
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCore" }

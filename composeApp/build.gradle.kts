@@ -64,7 +64,7 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.webcam.capture)
-            implementation(libs.webcam.capture.driver.fswebcam)
+            implementation(libs.webcam.capture.driver.opencv)
         }
     }
 }
