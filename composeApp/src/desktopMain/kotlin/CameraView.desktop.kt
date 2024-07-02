@@ -1,26 +1,32 @@
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import com.github.sarxos.webcam.Webcam
 import com.github.sarxos.webcam.WebcamPanel
 import com.github.sarxos.webcam.WebcamResolution
+import com.github.sarxos.webcam.ds.javacv.JavaCvDriver
+import java.util.Locale
 
 @Composable
 actual fun CameraView() {
-    var error:Throwable = Throwable(message = "No webcam found")
-    val webcam = remember { runCatching { Webcam.getDefault()}.getOrElse {
-        error = it
-        null
-    } }
 
+    val os = System.getProperty("os.name").lowercase(Locale.getDefault())
+    var error: Throwable = Throwable(message = "No webcam found")
+
+    if (os.startsWith("mac")) {
+      Webcam.setDriver(JavaCvDriver::class.java)
+    }
+
+    val webcam = remember {
+        runCatching { Webcam.getDefault() }.getOrElse {
+            error = it
+            null
+        }
+    }
 
     if (webcam != null) {
         webcam.viewSize = WebcamResolution.VGA.size
@@ -30,7 +36,6 @@ actual fun CameraView() {
             onDispose {
                 webcam.close()
             }
-
         }
 
         val panel = remember {
@@ -48,12 +53,12 @@ actual fun CameraView() {
             }
         }
 
-            SwingPanel(
-                factory = { panel },
-                modifier = Modifier.fillMaxSize()
-            )
+        SwingPanel(
+            factory = { panel },
+            modifier = Modifier.fillMaxSize()
+        )
 
     } else {
-        Text(text = error.cause?.message?:"No webcams found.")
+        Text(text = "Oops: ${error.message?: "Unknown error"}")
     }
 }
