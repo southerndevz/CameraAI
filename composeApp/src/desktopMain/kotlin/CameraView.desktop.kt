@@ -3,6 +3,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
@@ -20,27 +21,39 @@ actual fun CameraView() {
         null
     } }
 
+
     if (webcam != null) {
-        webcam.viewSize = WebcamResolution.FHD.size
-        webcam.open()
-        val density = LocalDensity.current.density
+        webcam.viewSize = WebcamResolution.VGA.size
+
+        DisposableEffect(webcam) {
+            webcam.open()
+            onDispose {
+                webcam.close()
+            }
+
+        }
 
         val panel = remember {
             WebcamPanel(webcam).apply {
-                isFPSDisplayed = true
-                isDisplayDebugInfo = true
-                isImageSizeDisplayed = true
+                isFPSDisplayed = false
+                isDisplayDebugInfo = false
+                isImageSizeDisplayed = false
                 isMirrored = true
             }
         }
-        Box(modifier = Modifier.fillMaxSize()) {
+
+        DisposableEffect(panel) {
+            onDispose {
+                panel.webcam.close()
+            }
+        }
+
             SwingPanel(
                 factory = { panel },
-                modifier = Modifier.size(width = (1080 * density).dp, height = (720 * density).dp)
+                modifier = Modifier.fillMaxSize()
             )
-        }
+
     } else {
         Text(text = error.cause?.message?:"No webcams found.")
     }
-
 }
