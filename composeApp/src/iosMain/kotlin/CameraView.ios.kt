@@ -9,6 +9,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVCaptureDeviceInput
 import platform.AVFoundation.AVCaptureDevicePositionBack
+import platform.AVFoundation.AVCaptureDevicePositionFront
 import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureSessionPresetPhoto
 import platform.AVFoundation.AVCaptureStillImageOutput
@@ -26,10 +27,16 @@ import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun CameraView() {
+actual fun CameraView(cameraOpened:Boolean, cameraSelected:CameraSelected) {
+
+    if(!cameraOpened) return ClosedCameraView()
 
     val device = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo).firstOrNull(){ device ->
-        (device as AVCaptureDevice).position == AVCaptureDevicePositionBack
+        (device as AVCaptureDevice).position == when (cameraSelected) {
+            CameraSelected.RearOrDefaultWebcam -> AVCaptureDevicePositionBack
+            CameraSelected.SelfieOrAdditionalWebcam -> AVCaptureDevicePositionFront
+            else -> AVCaptureDevicePositionBack
+        }
     }!! as AVCaptureDevice
 
     val input = AVCaptureDeviceInput.deviceInputWithDevice(device, error = null) as AVCaptureDeviceInput

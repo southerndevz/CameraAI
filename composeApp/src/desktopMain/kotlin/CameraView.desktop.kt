@@ -2,6 +2,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
@@ -11,35 +12,45 @@ import com.github.sarxos.webcam.WebcamResolution
 import com.github.sarxos.webcam.ds.javacv.JavaCvDriver
 import java.util.Locale
 
+
 @Composable
-actual fun CameraView() {
+actual fun CameraView(cameraOpened:Boolean, cameraSelected:CameraSelected) {
 
     val os = System.getProperty("os.name").lowercase(Locale.getDefault())
-    var error: Throwable = Throwable(message = "No webcam found")
+    var error = Throwable(message = "Error retrieving webcam(s)")
+    var currentWebcamNumber = remember { 0 }
 
     if (os.startsWith("mac")) {
       Webcam.setDriver(JavaCvDriver::class.java)
     }
 
-    val webcam = remember {
-        runCatching { Webcam.getDefault() }.getOrElse {
+    val webcams = remember {
+        runCatching { Webcam.getWebcams() }.getOrElse {
             error = it
             null
         }
     }
 
-    if (webcam != null) {
-        webcam.viewSize = WebcamResolution.VGA.size
+    if (!webcams.isNullOrEmpty()) {
 
-        DisposableEffect(webcam) {
-            webcam.open()
-            onDispose {
-                webcam.close()
+        key(cameraSelected) {
+            webcams.forEach { it.device.close() }
+            currentWebcamNumber = when (cameraSelected) {
+                CameraSelected.RearOrDefaultWebcam -> 0
+                CameraSelected.SelfieOrAdditionalWebcam -> {
+                    if (webcams.size > 1) 1 else 0
+                }
+                else -> 0
             }
         }
 
+
+
+        val webcam = remember { webcams[currentWebcamNumber] }
+        webcam.viewSize = WebcamResolution.VGA.size
+
         val panel = remember {
-            WebcamPanel(webcam).apply {
+            WebcamPanel(webcam, false).apply {
                 isFPSDisplayed = false
                 isDisplayDebugInfo = false
                 isImageSizeDisplayed = false
@@ -49,16 +60,29 @@ actual fun CameraView() {
 
         DisposableEffect(panel) {
             onDispose {
-                panel.webcam.close()
+                panel.let {
+                    if (it.webcam.isOpen) it.webcam.close()
+                    webcams.forEach { webcam -> webcam.device.close() }
+                    if (it.isStarted || it.isStarting || it.isShowing) it.stop()
+                }
             }
         }
 
+        if (!cameraOpened) {
+            panel.let {
+                if (it.webcam.isOpen) it.webcam.close()
+                webcams.forEach { webcam -> webcam.device.close() }
+                if (it.isStarted || it.isStarting || it.isShowing) it.stop()
+            }
+            return ClosedCameraView()
+        }
+
         SwingPanel(
-            factory = { panel },
+            factory = { panel.apply { this.start() } },
             modifier = Modifier.fillMaxSize()
         )
 
     } else {
-        Text(text = "Oops: ${error.message?: "Unknown error"}")
+        Text(text = "Oops: ${error.message?: "No webcams detected."}")
     }
 }
