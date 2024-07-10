@@ -1,11 +1,12 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -26,6 +27,7 @@ import cameraai.composeapp.generated.resources.camera_shutter
 import cameraai.composeapp.generated.resources.camera_slash
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import ui.systemBarsPadding
 
 @Composable
 @Preview
@@ -37,6 +39,7 @@ fun App() {
 
         var cameraOpen by remember { mutableStateOf(true) }
         var selectedCamera:CameraSelected by remember { mutableStateOf(CameraSelected.RearOrDefaultWebcam) }
+        val systemBarsPadding = remember { systemBarsPadding }
 
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -44,38 +47,55 @@ fun App() {
                 CameraView(cameraOpen, selectedCamera)
             }
             Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                CameraControls(
-                    cameraOpen,
-                    selectedCamera,
-                    onCameraOpenChange = { cameraOpen = it },
-                    onCameraChange = { if (cameraOpen) selectedCamera = it })
+                    CameraControls(
+                        cameraOpen,
+                        selectedCamera,
+                        onCameraOpenChange = { cameraOpen = it },
+                        onCameraChange = { if (cameraOpen) selectedCamera = it })
             }
         }
     }
 }
 @Composable
 fun CameraControls(cameraOpen: Boolean, selectedCamera:CameraSelected, onCameraOpenChange: (Boolean) -> Unit, onCameraChange: (CameraSelected) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().background(Color.Black.copy(alpha = 0.45f)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
+    Column (modifier = Modifier.fillMaxWidth().background(Color.Black.copy(alpha = 0.6f))) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
 
-        IconButton(modifier = Modifier.size(30.dp), onClick = { onCameraOpenChange(!cameraOpen) }) {
-            Icon(painter = painterResource(Res.drawable.camera_slash), contentDescription = "Stop Camera", tint = if (cameraOpen) Color.White.copy(alpha = 0.3f) else Color.White )
-        }
-
-        IconButton(modifier = Modifier.size(90.dp), onClick = { /*TODO*/ }) {
-            Icon(painter = painterResource(Res.drawable.camera_shutter), contentDescription = "Capture", tint = Color.White)
-        }
-
-        IconButton(modifier = Modifier.size(30.dp), onClick = {
-            when (selectedCamera) {
-                CameraSelected.RearOrDefaultWebcam -> onCameraChange(CameraSelected.SelfieOrAdditionalWebcam)
-                CameraSelected.SelfieOrAdditionalWebcam -> onCameraChange(CameraSelected.RearOrDefaultWebcam)
+            IconButton(
+                modifier = Modifier.size(30.dp),
+                onClick = { onCameraOpenChange(!cameraOpen) }) {
+                Icon(
+                    painter = painterResource(Res.drawable.camera_slash),
+                    contentDescription = "Stop Camera",
+                    tint = if (cameraOpen) Color.White.copy(alpha = 0.3f) else Color.White
+                )
             }
-        }) {
-            Icon(painter = painterResource(Res.drawable.camera_change), contentDescription = "Swap Camera", tint = Color.White)
+
+            IconButton(modifier = Modifier.size(90.dp), onClick = { /*TODO*/ }) {
+                Icon(
+                    painter = painterResource(Res.drawable.camera_shutter),
+                    contentDescription = "Capture",
+                    tint = Color.White
+                )
+            }
+
+            IconButton(modifier = Modifier.size(30.dp), onClick = {
+                when (selectedCamera) {
+                    CameraSelected.RearOrDefaultWebcam -> onCameraChange(CameraSelected.SelfieOrAdditionalWebcam)
+                    CameraSelected.SelfieOrAdditionalWebcam -> onCameraChange(CameraSelected.RearOrDefaultWebcam)
+                }
+            }) {
+                Icon(
+                    painter = painterResource(Res.drawable.camera_change),
+                    contentDescription = "Swap Camera",
+                    tint = Color.White
+                )
+            }
         }
+        Spacer(modifier = Modifier.padding(systemBarsPadding.navigationBarSpacerPVs).background(Color.Transparent))
     }
 }
