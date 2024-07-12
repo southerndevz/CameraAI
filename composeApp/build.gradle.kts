@@ -51,7 +51,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            //implementation(libs.haze.materials)
+            implementation(libs.haze.materials)
             implementation(libs.haze)
 
             implementation(libs.ktor.client.core)
