@@ -6,14 +6,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import dev.chrisbanes.haze.HazeDefaults
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.haze
 
 @Composable
-actual fun CameraView (cameraOpened:Boolean, cameraSelected:CameraSelected) {
+actual fun CameraView (cameraOpened: Boolean, cameraSelected: CameraSelected, hazeState: HazeState) {
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -23,7 +28,7 @@ actual fun CameraView (cameraOpened:Boolean, cameraSelected:CameraSelected) {
 
     if(!cameraOpened) {
         cameraProviderFuture.get().unbindAll()
-        return ClosedCameraView()
+        return ClosedCameraView(hazeState = hazeState)
     }
 
     key(cameraSelected) {
@@ -31,7 +36,16 @@ actual fun CameraView (cameraOpened:Boolean, cameraSelected:CameraSelected) {
     }
 
     AndroidView(factory = { previewView },
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .haze(
+                state = hazeState,
+                style = HazeStyle(
+                    tint = Color.Black.copy(alpha = .2f),
+                    blurRadius = 30.dp,
+                    noiseFactor = HazeDefaults.noiseFactor
+                )
+            )
+        ,
         update = { _ ->
             val cameraProvider = cameraProviderFuture.get()
             val preview = Preview.Builder().build()

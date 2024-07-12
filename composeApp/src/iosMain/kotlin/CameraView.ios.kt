@@ -4,6 +4,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.unit.dp
+import dev.chrisbanes.haze.HazeDefaults
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.haze
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFoundation.AVCaptureDevice
@@ -27,9 +32,9 @@ import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun CameraView(cameraOpened:Boolean, cameraSelected:CameraSelected) {
+actual fun CameraView(cameraOpened: Boolean, cameraSelected: CameraSelected, hazeState: HazeState) {
 
-    if(!cameraOpened) return ClosedCameraView()
+    if(!cameraOpened) return ClosedCameraView(hazeState = hazeState)
 
     val device = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo).firstOrNull(){ device ->
         (device as AVCaptureDevice).position == when (cameraSelected) {
@@ -44,6 +49,7 @@ actual fun CameraView(cameraOpened:Boolean, cameraSelected:CameraSelected) {
     val output = AVCaptureStillImageOutput()
     output.outputSettings = mapOf(AVVideoCodecKey to AVVideoCodecJPEG)
 
+
     val session  = AVCaptureSession()
     session.sessionPreset = AVCaptureSessionPresetPhoto
 
@@ -53,7 +59,16 @@ actual fun CameraView(cameraOpened:Boolean, cameraSelected:CameraSelected) {
     val cameraPreviewLayer = remember { AVCaptureVideoPreviewLayer(session = session) }
 
     UIKitView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .haze(
+                state = hazeState,
+                style = HazeStyle(
+                    tint = Color.Black.copy(alpha = .2f),
+                    blurRadius = 30.dp,
+                    noiseFactor = HazeDefaults.noiseFactor
+                )
+            )
+        ,
         background = Color.Black,
         factory = {
             val container = UIView()
