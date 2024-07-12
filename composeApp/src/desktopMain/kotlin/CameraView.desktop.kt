@@ -57,7 +57,7 @@ actual fun CameraView(cameraOpened: Boolean, cameraSelected: CameraSelected, haz
 
 
         val webcam = remember { webcams[currentWebcamNumber] }
-        webcam.viewSize = WebcamResolution.HD.size
+        webcam.viewSize = WebcamResolution.VGA.size
 
         val panel = WebcamPanel(webcam.apply { close() }, false).apply {
                 isFPSDisplayed = false
