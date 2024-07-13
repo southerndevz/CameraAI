@@ -17,11 +17,7 @@ So far I am able to display a camera feed on:
 <img src="https://github.com/user-attachments/assets/154d9401-bd44-42f7-b235-d42acd66506f" height="650">
 <img src="https://github.com/user-attachments/assets/b0a18a9c-385c-4e8d-aba5-b78c1177fd85" height="650">
 
+Not tested but should run without a problem on Linux (JVM) since all JVM targets run without issue, therefore it's given that this will run.
 
 
-Not tested but should run without a problem on Linux (JVM), _all JVM targets run without issue, therefore it's given that this will run. I don't have a Linux computer to test on._
-
-
-**Note:** Currently the JVM Desktop uses a JavaCVDriver that target all platforms including Mac, Windows, Linux, Android, etc. except for macOS support for other targets are not necessary since they already work with the default driver. In future commits I will remove these dependencies but it is not priority now. [More Info: Reducing The Number of JavaCV Dependencies](https://github.com/bytedeco/javacpp-presets/wiki/Reducing-the-Number-of-Dependencies)
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+**Note:** _Currently the JVM Desktop uses a JavaCVDriver that target all platforms including Mac, Windows, Linux, Android, etc. except for macOS support for other targets are not necessary since they already work with the default driver. In future commits I will remove these dependencies but it is not priority now._ [More Info: Reducing The Number of JavaCV Dependencies](https://github.com/bytedeco/javacpp-presets/wiki/Reducing-the-Number-of-Dependencies)
